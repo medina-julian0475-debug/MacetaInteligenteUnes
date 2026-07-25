@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agri Smart System</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon192.png">
+<link rel="apple-touch-icon" href="icon512.png">
+<meta name="theme-color" content="#07111f">
+
+<script>
+if ('serviceWorker' in navigator){
+navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+body{
+background:linear-gradient(160deg,#020617,#07111f,#052e16);
+overflow-x:hidden;
+}
+
+.card{
+backdrop-filter:blur(15px);
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.1);
+box-shadow:0 0 25px rgba(0,255,140,.08);
+}
+
+.glow{
+animation:glow 2s infinite;
+}
+
+@keyframes glow{
+
+0%{
+opacity:.6;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+opacity:.6;
+}
+
+}
+
+.bar{
+transition:all .8s ease;
+}
+
+</style>
+
+</head>
+
+<body class="text-white min-h-screen p-5 font-sans">
+
+<div class="max-w-md mx-auto space-y-5">
+
+<!-- LOGO -->
+
+<div class="text-center space-y-2">
+
+<div class="text-6xl glow">
+🌱
+</div>
+
+<h1 class="text-3xl font-bold text-emerald-400">
+AGRI SMART SYSTEM
+</h1>
+
+<p class="text-sm text-slate-300">
+ESP32 IoT Monitor
+</p>
+
+<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20">
+
+<div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
+
+ONLINE
+
+</div>
+
+</div>
+
+
+<!-- ESTADO DE LA PLANTA -->
+
+<div class="card rounded-3xl p-5 text-center">
+
+<p class="text-slate-400 text-sm">
+ESTADO DE LA PLANTA
+</p>
+
+<div id="plantEmoji" class="text-6xl mt-3">
+🌱
+</div>
+
+<h2 id="plantState" class="text-2xl font-bold text-emerald-400 mt-3">
+
+HUMEDAD ÓPTIMA
+
+</h2>
+
+<p class="text-slate-300 mt-2">
+Sistema funcionando correctamente.
+</p>
+
+</div>
+
+
+
+<!-- HUMEDAD DEL SUELO -->
+
+
+<div class="card rounded-3xl p-5">
+
+<div class="flex justify-between">
+
+<h2 class="font-bold">
+HUMEDAD DEL SUELO
+</h2>
+
+<span id="soilValue" class="text-3xl font-bold text-blue-400">
+
+28%
+
+</span>
+
+</div>
+
+
+<div class="w-full bg-slate-800 rounded-full h-4 mt-4">
+
+<div id="soilBar"
+
+class="bar h-4 rounded-full bg-blue-500"
+
+style="width:28%;">
+
+</div>
+
+</div>
+
+
+<p id="soilText"
+
+class="text-center mt-3 text-slate-300">
+
+Necesita agua.
+
+</p>
+
+</div>
+
+
+
+
+<!-- TEMPERATURA -->
+
+
+<div class="card rounded-3xl p-5 text-center">
+
+<p class="text-slate-400">
+TEMPERATURA
+</p>
+
+<h2 id="tempValue"
+
+class="text-5xl font-bold text-orange-400 mt-2">
+
+24°C
+
+</h2>
+
+<p class="mt-2 text-slate-300">
+
+NORMAL
+
+</p>
+
+</div>
+
+
+
+
+<!-- HUMEDAD AMBIENTE -->
+
+
+<div class="card rounded-3xl p-5 text-center">
+
+<p class="text-slate-400">
+
+HUMEDAD AMBIENTE
+
+</p>
+
+<h2 id="humValue"
+
+class="text-5xl font-bold text-cyan-400 mt-2">
+
+60%
+
+</h2>
+
+</div>
+
+
+
+
+<!-- BOMBA -->
+
+
+<div class="card rounded-3xl p-5">
+
+<div class="flex justify-between">
+
+<h2 class="font-bold">
+
+BOMBA DE AGUA
+
+</h2>
+
+<span id="pumpStatus"
+
+class="text-emerald-400">
+
+APAGADA
+
+</span>
+
+</div>
+
+
+<button
+
+id="pumpBtn"
+
+onclick="togglePump()"
+
+class="w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold">
+
+ACTIVAR RIEGO
+
+</button>
+
+</div>
+
+
+
+
+<!-- ESP32 -->
+
+
+<div class="card rounded-3xl p-5">
+
+<div class="flex justify-between">
+
+<span>
+
+ESP32
+
+</span>
+
+<span class="text-emerald-400">
+
+● ONLINE
+
+</span>
+
+</div>
+
+
+<div class="flex justify-between mt-4">
+
+<span>
+
+WIFI
+
+</span>
+
+<span class="text-emerald-400">
+
+● CONECTADO
+
+</span>
+
+</div>
+
+
+<div class="flex justify-between mt-4">
+
+<span>
+
+ÚLTIMA ACTUALIZACIÓN
+
+</span>
+
+<span id="clock">
+
+00:00:00
+
+</span>
+
+</div>
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+let pump=false;
+
+
+
+function togglePump(){
+
+pump=!pump;
+
+const btn=document.getElementById("pumpBtn");
+
+const status=document.getElementById("pumpStatus");
+
+
+if(pump){
+
+btn.innerText="DETENER RIEGO";
+
+btn.className="w-full mt-5 py-4 rounded-2xl bg-red-600 font-bold";
+
+status.innerText="ENCENDIDA";
+
+status.className="text-red-400";
+
+}
+
+
+else{
+
+btn.innerText="ACTIVAR RIEGO";
+
+btn.className="w-full mt-5 py-4 rounded-2xl bg-blue-600 font-bold";
+
+status.innerText="APAGADA";
+
+status.className="text-emerald-400";
+
+}
+
+
+}
+
+
+
+
+function updateDashboard(soil,temp,hum){
+
+document.getElementById("soilValue").innerText=soil+"%";
+
+document.getElementById("tempValue").innerText=temp+"°C";
+
+document.getElementById("humValue").innerText=hum+"%";
+
+document.getElementById("soilBar").style.width=soil+"%";
+
+
+const emoji=document.getElementById("plantEmoji");
+
+const state=document.getElementById("plantState");
+
+const text=document.getElementById("soilText");
+
+
+if(soil<35){
+
+emoji.innerText="🥀";
+
+state.innerText="SUELO SECO";
+
+state.className="text-2xl font-bold text-red-400 mt-3";
+
+text.innerText="Necesita agua.";
+
+}
+
+
+else if(soil<70){
+
+emoji.innerText="🌱";
+
+state.innerText="HUMEDAD NORMAL";
+
+state.className="text-2xl font-bold text-emerald-400 mt-3";
+
+text.innerText="La planta se encuentra saludable.";
+
+}
+
+
+else{
+
+emoji.innerText="🌳";
+
+state.innerText="HUMEDAD ÓPTIMA";
+
+state.className="text-2xl font-bold text-cyan-400 mt-3";
+
+text.innerText="Excelente nivel de humedad.";
+
+}
+
+
+}
+
+
+
+setInterval(()=>{
+
+const hora=new Date();
+
+document.getElementById("clock").innerText=
+
+hora.toLocaleTimeString();
+
+},1000);
+
+
+
+updateDashboard(
+
+28,
+
+24,
+
+60
+
+);
+
+
+</script>
+
+</body>
+</html>
