@@ -365,7 +365,7 @@ status.className="text-emerald-400";
 
 
 
-function updateDashboard(soil,temp,hum){
+function updateDashboard(soil,temp,hum,bomba){
 
 document.getElementById("soilValue").innerText=soil+"%";
 
@@ -422,8 +422,31 @@ text.innerText="Excelente nivel de humedad.";
 
 }
 
+// Estado de la bomba
+const status = document.getElementById("pumpStatus");
+const btn = document.getElementById("pumpBtn");
+
+if(bomba === "ENCENDIDA"){
+
+    status.innerText = "ENCENDIDA";
+    status.className = "text-red-400";
+
+    btn.innerText = "DETENER RIEGO";
+    btn.className = "w-full mt-5 py-4 rounded-2xl bg-red-600 hover:bg-red-500 font-bold";
+
+}else{
+
+    status.innerText = "APAGADA";
+    status.className = "text-emerald-400";
+
+    btn.innerText = "ACTIVAR RIEGO";
+    btn.className = "w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold";
 
 }
+
+
+}
+
 async function leerESP32(){
 
     try{
@@ -439,7 +462,8 @@ async function leerESP32(){
         updateDashboard(
             datos.humedadSuelo,
             24,
-            60
+            60,
+            datos.bomba
         );
 
     }catch(error){
