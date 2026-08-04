@@ -253,6 +253,32 @@ ACTIVAR RIEGO
 
 </div>
 
+<!-- MODO DE RIEGO -->
+
+<div class="card rounded-3xl p-5">
+
+    <div class="flex justify-between">
+
+        <h2 class="font-bold">
+            MODO DE RIEGO
+        </h2>
+
+        <span id="modeStatus" class="text-emerald-400">
+            AUTOMÁTICO
+        </span>
+
+    </div>
+
+    <button
+        id="modeBtn"
+        onclick="toggleMode()"
+        class="w-full mt-5 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-bold">
+
+        CAMBIAR A MANUAL
+
+    </button>
+
+</div>
 
 
 
@@ -321,51 +347,61 @@ WIFI
 <script>
 
 let pump=false;
+let automatico = true;
 const ESP32_IP = "http://192.168.1.23";
 
 
 
-function togglePump(){
+async function togglePump(){
 
-pump=!pump;
+    pump=!pump;
 
-const btn=document.getElementById("pumpBtn");
+    const btn=document.getElementById("pumpBtn");
+    const status=document.getElementById("pumpStatus");
 
-const status=document.getElementById("pumpStatus");
+
+    try{
+
+        if(pump){
+
+            await fetch(ESP32_IP + "/bomba/on");
+
+            btn.innerText="DETENER RIEGO";
+            btn.className="w-full mt-5 py-4 rounded-2xl bg-red-600 hover:bg-red-500 font-bold";
+
+            status.innerText="ENCENDIDA";
+            status.className="text-red-400";
 
 
-if(pump){
+        }else{
 
-btn.innerText="DETENER RIEGO";
 
-btn.className="w-full mt-5 py-4 rounded-2xl bg-red-600 font-bold";
+            await fetch(ESP32_IP + "/bomba/off");
 
-status.innerText="ENCENDIDA";
 
-status.className="text-red-400";
+            btn.innerText="ACTIVAR RIEGO";
+            btn.className="w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold";
+
+
+            status.innerText="APAGADA";
+            status.className="text-emerald-400";
+
+
+        }
+
+
+    }catch(error){
+
+        console.log("Error bomba:",error);
+
+    }
 
 }
 
 
-else{
-
-btn.innerText="ACTIVAR RIEGO";
-
-btn.className="w-full mt-5 py-4 rounded-2xl bg-blue-600 font-bold";
-
-status.innerText="APAGADA";
-
-status.className="text-emerald-400";
-
-}
 
 
-}
-
-
-
-
-function updateDashboard(soil,temp,hum,bomba){
+function updateDashboard(soil,temp,hum,bomba,modo){
 
 document.getElementById("soilValue").innerText=soil+"%";
 
@@ -443,10 +479,48 @@ if(bomba === "ENCENDIDA"){
     btn.className = "w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold";
 
 }
+const modeStatus = document.getElementById("modeStatus");
+const modeBtn = document.getElementById("modeBtn");
 
+if(modo === "AUTOMATICO"){
+
+    automatico = true;
+
+    modeStatus.innerText = "AUTOMÁTICO";
+    modeStatus.className = "text-emerald-400";
+
+    modeBtn.innerText = "CAMBIAR A MANUAL";
+    modeBtn.className = "w-full mt-5 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-bold";
+
+}else{
+
+    automatico = false;
+
+    modeStatus.innerText = "MANUAL";
+    modeStatus.className = "text-yellow-400";
+
+    modeBtn.innerText = "CAMBIAR A AUTOMÁTICO";
+    modeBtn.className = "w-full mt-5 py-4 rounded-2xl bg-yellow-600 hover:bg-yellow-500 font-bold";
 
 }
 
+
+}
+async function toggleMode(){
+
+    if(automatico){
+
+        await fetch(ESP32_IP + "/modo/manual");
+
+    }else{
+
+        await fetch(ESP32_IP + "/modo/auto");
+
+    }
+
+    leerESP32();
+
+}
 async function leerESP32(){
 
     try{
@@ -463,7 +537,8 @@ async function leerESP32(){
             datos.humedadSuelo,
             24,
             60,
-            datos.bomba
+            datos.bomba,
+            datos.modo 
         );
 
     }catch(error){
