@@ -12,50 +12,38 @@
 
 <script>
 if ('serviceWorker' in navigator){
-navigator.serviceWorker.register("sw.js");
+  navigator.serviceWorker.register("sw.js");
 }
 </script>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-
-body{
-background:linear-gradient(160deg,#020617,#07111f,#052e16);
-overflow-x:hidden;
+body {
+  background: linear-gradient(160deg,#020617,#07111f,#052e16);
+  overflow-x: hidden;
 }
 
-.card{
-backdrop-filter:blur(15px);
-background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.1);
-box-shadow:0 0 25px rgba(0,255,140,.08);
+.card {
+  backdrop-filter: blur(15px);
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 0 25px rgba(0,255,140,.08);
 }
 
-.glow{
-animation:glow 2s infinite;
+.glow {
+  animation: glow 2s infinite;
 }
 
-@keyframes glow{
-
-0%{
-opacity:.6;
+@keyframes glow {
+  0% { opacity: .6; }
+  50% { opacity: 1; }
+  100% { opacity: .6; }
 }
 
-50%{
-opacity:1;
+.bar {
+  transition: all .8s ease;
 }
-
-100%{
-opacity:.6;
-}
-
-}
-
-.bar{
-transition:all .8s ease;
-}
-
 </style>
 
 </head>
@@ -65,509 +53,213 @@ transition:all .8s ease;
 <div class="max-w-md mx-auto space-y-5">
 
 <!-- LOGO -->
-
 <div class="text-center space-y-2">
-
-<div class="text-6xl glow">
-🌱
+  <div class="text-6xl glow">🌱</div>
+  <h1 class="text-3xl font-bold text-emerald-400">AGRI SMART SYSTEM</h1>
+  <p class="text-sm text-slate-300">ESP32 IoT Monitor</p>
+  
+  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20">
+    <div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
+    <span id="espStatusBadge">ONLINE</span>
+  </div>
 </div>
-
-<h1 class="text-3xl font-bold text-emerald-400">
-AGRI SMART SYSTEM
-</h1>
-
-<p class="text-sm text-slate-300">
-ESP32 IoT Monitor
-</p>
-
-<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20">
-
-<div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
-
-ONLINE
-
-</div>
-
-</div>
-
 
 <!-- ESTADO DE LA PLANTA -->
-
 <div class="card rounded-3xl p-5 text-center">
-
-<p class="text-slate-400 text-sm">
-ESTADO DE LA PLANTA
-</p>
-
-<div id="plantEmoji" class="text-6xl mt-3">
-🌱
+  <p class="text-slate-400 text-sm">ESTADO DE LA PLANTA</p>
+  <div id="plantEmoji" class="text-6xl mt-3">🌱</div>
+  <h2 id="plantState" class="text-2xl font-bold text-emerald-400 mt-3">ESPERANDO DATOS...</h2>
+  <p id="soilText" class="text-slate-300 mt-2">Conectando con el sistema.</p>
 </div>
-
-<h2 id="plantState" class="text-2xl font-bold text-emerald-400 mt-3">
-
-HUMEDAD ÓPTIMA
-
-</h2>
-
-<p class="text-slate-300 mt-2">
-Sistema funcionando correctamente.
-</p>
-
-</div>
-
-
 
 <!-- HUMEDAD DEL SUELO -->
-
-
 <div class="card rounded-3xl p-5">
-
-<div class="flex justify-between">
-
-<h2 class="font-bold">
-HUMEDAD DEL SUELO
-</h2>
-
-<span id="soilValue" class="text-3xl font-bold text-blue-400">
-
-0%
-
-</span>
-
+  <div class="flex justify-between">
+    <h2 class="font-bold">HUMEDAD DEL SUELO</h2>
+    <span id="soilValue" class="text-3xl font-bold text-blue-400">0%</span>
+  </div>
+  <div class="w-full bg-slate-800 rounded-full h-4 mt-4">
+    <div id="soilBar" class="bar h-4 rounded-full bg-blue-500" style="width:0%;"></div>
+  </div>
 </div>
-
-
-<div class="w-full bg-slate-800 rounded-full h-4 mt-4">
-
-<div id="soilBar"
-
-class="bar h-4 rounded-full bg-blue-500"
-
-style="width:0%;">
-
-</div>
-
-</div>
-
-
-<p id="soilText"
-
-class="text-center mt-3 text-slate-300">
-
-Necesita agua.
-
-</p>
-
-</div>
-
-
-
 
 <!-- TEMPERATURA -->
-
-
 <div class="card rounded-3xl p-5 text-center">
-
-<p class="text-slate-400">
-TEMPERATURA
-</p>
-
-<h2 id="tempValue"
-
-class="text-5xl font-bold text-orange-400 mt-2">
-
-0°C
-
-</h2>
-
-<p class="mt-2 text-slate-300">
-
-NORMAL
-
-</p>
-
+  <p class="text-slate-400">TEMPERATURA</p>
+  <h2 id="tempValue" class="text-5xl font-bold text-orange-400 mt-2">0°C</h2>
 </div>
-
-
-
 
 <!-- HUMEDAD AMBIENTE -->
-
-
 <div class="card rounded-3xl p-5 text-center">
-
-<p class="text-slate-400">
-
-HUMEDAD AMBIENTE
-
-</p>
-
-<h2 id="humValue"
-
-class="text-5xl font-bold text-cyan-400 mt-2">
-
-0%
-
-</h2>
-
+  <p class="text-slate-400">HUMEDAD AMBIENTE</p>
+  <h2 id="humValue" class="text-5xl font-bold text-cyan-400 mt-2">0%</h2>
 </div>
-
-
-
 
 <!-- BOMBA -->
-
-
 <div class="card rounded-3xl p-5">
-
-<div class="flex justify-between">
-
-<h2 class="font-bold">
-
-BOMBA DE AGUA
-
-</h2>
-
-<span id="pumpStatus"
-
-class="text-emerald-400">
-
-APAGADA
-
-</span>
-
-</div>
-
-
-<button
-
-id="pumpBtn"
-
-onclick="togglePump()"
-
-class="w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold">
-
-ACTIVAR RIEGO
-
-</button>
-
+  <div class="flex justify-between">
+    <h2 class="font-bold">BOMBA DE AGUA</h2>
+    <span id="pumpStatus" class="text-emerald-400 font-bold">APAGADA</span>
+  </div>
+  <button id="pumpBtn" onclick="togglePump()" class="w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold transition-all">
+    ACTIVAR RIEGO
+  </button>
 </div>
 
 <!-- MODO DE RIEGO -->
-
 <div class="card rounded-3xl p-5">
-
-    <div class="flex justify-between">
-
-        <h2 class="font-bold">
-            MODO DE RIEGO
-        </h2>
-
-        <span id="modeStatus" class="text-emerald-400">
-            AUTOMÁTICO
-        </span>
-
-    </div>
-
-    <button
-        id="modeBtn"
-        onclick="toggleMode()"
-        class="w-full mt-5 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-bold">
-
-        CAMBIAR A MANUAL
-
-    </button>
-
+  <div class="flex justify-between">
+    <h2 class="font-bold">MODO DE RIEGO</h2>
+    <span id="modeStatus" class="text-emerald-400 font-bold">AUTOMÁTICO</span>
+  </div>
+  <button id="modeBtn" onclick="toggleMode()" class="w-full mt-5 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-bold transition-all">
+    CAMBIAR A MANUAL
+  </button>
 </div>
 
-
-
-<!-- ESP32 -->
-
-
+<!-- ESTADÍSTICAS SISTEMA -->
 <div class="card rounded-3xl p-5">
-
-<div class="flex justify-between">
-
-<span>
-
-ESP32
-
-</span>
-
-<span class="text-emerald-400">
-
-● ONLINE
-
-</span>
-
-</div>
-
-
-<div class="flex justify-between mt-4">
-
-<span>
-
-WIFI
-
-</span>
-
-<span class="text-emerald-400">
-
-● CONECTADO
-
-</span>
-
-</div>
-
-
-<div class="flex justify-between mt-4">
-
-<span>
-
-ÚLTIMA ACTUALIZACIÓN
-
-</span>
-
-<span id="clock">
-
-00:00:00
-
-</span>
-
+  <div class="flex justify-between mt-2">
+    <span>ÚLTIMA ACTUALIZACIÓN</span>
+    <span id="clock" class="text-emerald-400">00:00:00</span>
+  </div>
 </div>
 
 </div>
-
-
-</div>
-
-
 
 <script>
-
-let pump=false;
 let automatico = true;
-const ESP32_IP = "http://192.168.1.16";
+const ESP32_IP = "http://192.168.1.16"; // Asegúrate de que esta sea la IP correcta de tu ESP32
 
-
-
+// Control de la bomba
 async function togglePump(){
-
-    pump=!pump;
-
-    const btn=document.getElementById("pumpBtn");
-    const status=document.getElementById("pumpStatus");
-
-
-    try{
-
-        if(pump){
-
-            await fetch(ESP32_IP + "/bomba/on");
-
-            btn.innerText="DETENER RIEGO";
-            btn.className="w-full mt-5 py-4 rounded-2xl bg-red-600 hover:bg-red-500 font-bold";
-
-            status.innerText="ENCENDIDA";
-            status.className="text-red-400";
-
-
-        }else{
-
-
-            await fetch(ESP32_IP + "/bomba/off");
-
-
-            btn.innerText="ACTIVAR RIEGO";
-            btn.className="w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold";
-
-
-            status.innerText="APAGADA";
-            status.className="text-emerald-400";
-
-
-        }
-
-
-    }catch(error){
-
-        console.log("Error bomba:",error);
-
-    }
-
+  const statusText = document.getElementById("pumpStatus").innerText;
+  const endpoint = (statusText === "ENCENDIDA") ? "/bomba/off" : "/bomba/on";
+  
+  try {
+    await fetch(ESP32_IP + endpoint);
+    setTimeout(leerESP32, 500); // Refresca rápido para mostrar el cambio
+  } catch(error) {
+    console.log("Error bomba:", error);
+  }
 }
 
-
-
-
-function updateDashboard(soil,temp,hum,bomba,modo){
-
-document.getElementById("soilValue").innerText=soil+"%";
-
-document.getElementById("tempValue").innerText=temp+"°C";
-
-document.getElementById("humValue").innerText=hum+"%";
-
-document.getElementById("soilBar").style.width=soil+"%";
-
-
-const emoji=document.getElementById("plantEmoji");
-
-const state=document.getElementById("plantState");
-
-const text=document.getElementById("soilText");
-
-
-if(soil<35){
-
-emoji.innerText="🥀";
-
-state.innerText="SUELO SECO";
-
-state.className="text-2xl font-bold text-red-400 mt-3";
-
-text.innerText="Necesita agua.";
-
-}
-
-
-else if(soil<70){
-
-emoji.innerText="🌱";
-
-state.innerText="HUMEDAD NORMAL";
-
-state.className="text-2xl font-bold text-emerald-400 mt-3";
-
-text.innerText="La planta se encuentra saludable.";
-
-}
-
-
-
-else{
-
-emoji.innerText="🌳";
-
-state.innerText="HUMEDAD ÓPTIMA";
-
-state.className="text-2xl font-bold text-cyan-400 mt-3";
-
-text.innerText="Excelente nivel de humedad.";
-
-}
-
-// Estado de la bomba
-const status = document.getElementById("pumpStatus");
-const btn = document.getElementById("pumpBtn");
-
-if(bomba === "ENCENDIDA"){
-
-    status.innerText = "ENCENDIDA";
-    status.className = "text-red-400";
-
-    btn.innerText = "DETENER RIEGO";
-    btn.className = "w-full mt-5 py-4 rounded-2xl bg-red-600 hover:bg-red-500 font-bold";
-
-}else{
-
-    status.innerText = "APAGADA";
-    status.className = "text-emerald-400";
-
-    btn.innerText = "ACTIVAR RIEGO";
-    btn.className = "w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold";
-
-}
-const modeStatus = document.getElementById("modeStatus");
-const modeBtn = document.getElementById("modeBtn");
-
-if(modo === "AUTOMATICO"){
-
-    automatico = true;
-
-    modeStatus.innerText = "AUTOMÁTICO";
-    modeStatus.className = "text-emerald-400";
-
-    modeBtn.innerText = "CAMBIAR A MANUAL";
-    modeBtn.className = "w-full mt-5 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-bold";
-
-}else{
-
-    automatico = false;
-
-    modeStatus.innerText = "MANUAL";
-    modeStatus.className = "text-yellow-400";
-
-    modeBtn.innerText = "CAMBIAR A AUTOMÁTICO";
-    modeBtn.className = "w-full mt-5 py-4 rounded-2xl bg-yellow-600 hover:bg-yellow-500 font-bold";
-
-}
-
-
-}
+// Control del modo Auto/Manual
 async function toggleMode(){
-
-    if(automatico){
-
-        await fetch(ESP32_IP + "/modo/manual");
-
-    }else{
-
-        await fetch(ESP32_IP + "/modo/auto");
-
-    }
-
-    leerESP32();
-
-}
-async function leerESP32(){
-
-    try{
-
-        const respuesta = await fetch(ESP32_IP + "/datos");
-
-        if(!respuesta.ok){
-            throw new Error("Error al conectar con la ESP32");
-        }
-
-        const datos = await respuesta.json();
-
-        updateDashboard(
-            datos.humedadSuelo,
-            24,
-            60,
-            datos.bomba,
-            datos.modo 
-        );
-
-    }catch(error){
-
-        console.log(error);
-
-    }
-
+  const endpoint = automatico ? "/modo/manual" : "/modo/auto";
+  
+  try {
+    await fetch(ESP32_IP + endpoint);
+    setTimeout(leerESP32, 500);
+  } catch(error) {
+    console.log("Error modo:", error);
+  }
 }
 
+// Pintar los datos en el HTML
+function updateDashboard(soil, temp, hum, bomba, modo) {
+  // 1. Valores principales
+  document.getElementById("soilValue").innerText = (soil ?? 0) + "%";
+  document.getElementById("tempValue").innerText = (temp ?? 0) + "°C";
+  document.getElementById("humValue").innerText = (hum ?? 0) + "%";
+  document.getElementById("soilBar").style.width = Math.min(Math.max(soil ?? 0, 0), 100) + "%";
 
-setInterval(()=>{
+  // 2. Estado visual de la planta según la humedad del suelo
+  const emoji = document.getElementById("plantEmoji");
+  const state = document.getElementById("plantState");
+  const text = document.getElementById("soilText");
 
-const hora=new Date();
+  if(soil < 30) {
+    emoji.innerText = "🥀";
+    state.innerText = "SUELO SECO";
+    state.className = "text-2xl font-bold text-red-400 mt-3";
+    text.innerText = "Necesita agua urgentemente.";
+  } else if(soil < 70) {
+    emoji.innerText = "🌱";
+    state.innerText = "HUMEDAD NORMAL";
+    state.className = "text-2xl font-bold text-emerald-400 mt-3";
+    text.innerText = "La planta se encuentra saludable.";
+  } else {
+    emoji.innerText = "🌳";
+    state.innerText = "HUMEDAD ÓPTIMA";
+    state.className = "text-2xl font-bold text-cyan-400 mt-3";
+    text.innerText = "Excelente nivel de humedad.";
+  }
 
-document.getElementById("clock").innerText=
+  // 3. UI de la Bomba
+  const status = document.getElementById("pumpStatus");
+  const btn = document.getElementById("pumpBtn");
+  if(bomba === "ENCENDIDA"){
+    status.innerText = "ENCENDIDA";
+    status.className = "text-red-400 font-bold";
+    btn.innerText = "DETENER RIEGO";
+    btn.className = "w-full mt-5 py-4 rounded-2xl bg-red-600 hover:bg-red-500 font-bold transition-all";
+  } else {
+    status.innerText = "APAGADA";
+    status.className = "text-emerald-400 font-bold";
+    btn.innerText = "ACTIVAR RIEGO";
+    btn.className = "w-full mt-5 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold transition-all";
+  }
 
-hora.toLocaleTimeString();
+  // 4. UI del Modo
+  const modeStatus = document.getElementById("modeStatus");
+  const modeBtn = document.getElementById("modeBtn");
+  if(modo === "AUTOMATICO"){
+    automatico = true;
+    modeStatus.innerText = "AUTOMÁTICO";
+    modeStatus.className = "text-emerald-400 font-bold";
+    modeBtn.innerText = "CAMBIAR A MANUAL";
+    modeBtn.className = "w-full mt-5 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-bold transition-all";
+  } else {
+    automatico = false;
+    modeStatus.innerText = "MANUAL";
+    modeStatus.className = "text-yellow-400 font-bold";
+    modeBtn.innerText = "CAMBIAR A AUTOMÁTICO";
+    modeBtn.className = "w-full mt-5 py-4 rounded-2xl bg-yellow-600 hover:bg-yellow-500 font-bold transition-all";
+  }
+}
 
-},1000);
+// Indicador de conexión ESP32
+function setConnectionState(isOnline) {
+  const espBadge = document.getElementById("espStatusBadge");
+  espBadge.innerText = isOnline ? "ONLINE" : "OFFLINE";
+  espBadge.className = isOnline ? "text-emerald-400 font-bold" : "text-red-400 font-bold";
+}
 
+// Pedir el JSON a la ESP32
+async function leerESP32() {
+  try {
+    const respuesta = await fetch(ESP32_IP + "/datos", { signal: AbortSignal.timeout(3000) });
+    if(!respuesta.ok) throw new Error("Fallo en la red");
+    
+    const datos = await respuesta.json();
+    
+    // Aquí está la magia: conectamos los datos del DHT22 (tempAmbiente y humAmbiente) al Dashboard
+    updateDashboard(
+      datos.humedadSuelo,
+      datos.tempAmbiente,
+      datos.humAmbiente,
+      datos.bomba,
+      datos.modo 
+    );
+    
+    setConnectionState(true);
+    
+  } catch(error) {
+    console.log("No se pudo leer la ESP32:", error);
+    setConnectionState(false);
+  }
+}
 
+// Reloj y actualización periódica
+setInterval(() => {
+  const hora = new Date();
+  document.getElementById("clock").innerText = hora.toLocaleTimeString();
+}, 1000);
 
 leerESP32();
-
-setInterval(leerESP32,2000);
-
+setInterval(leerESP32, 2000); // Pide datos cada 2 segundos
 
 </script>
-
 </body>
 </html>
